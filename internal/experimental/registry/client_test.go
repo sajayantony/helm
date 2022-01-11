@@ -311,6 +311,26 @@ func (suite *RegistryClientTestSuite) Test_4_ManInTheMiddle() {
 	suite.True(errdefs.IsFailedPrecondition(err))
 }
 
+func (suite *RegistryClientTestSuite) Test_5_Tags() {
+
+	// Load test chart (to build ref pushed in previous test)
+	chartData, err := ioutil.ReadFile("../../../pkg/downloader/testdata/local-subchart-0.1.0.tgz")
+	suite.Nil(err, "no error loading test chart")
+	meta, err := extractChartMeta(chartData)
+	suite.Nil(err, "no error extracting chart meta")
+	ref := fmt.Sprintf("%s/testrepo/%s", suite.DockerRegistryHost, meta.Name)
+
+	// // Simple pull, chart only
+	// _, err = suite.RegistryClient.Pull(ref)
+	// suite.Nil(err, "no error pulling a simple chart")
+
+	// // Simple pull, chart only
+	tags, err := suite.RegistryClient.Tags(ref)
+	suite.Nil(err, "no error retrieving tags")
+	suite.Equal(int64(1), len(tags))
+
+}
+
 func TestRegistryClientTestSuite(t *testing.T) {
 	suite.Run(t, new(RegistryClientTestSuite))
 }
